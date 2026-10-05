@@ -90,11 +90,19 @@ def main():
                f'alt="The rest of the story — full CV, certifications, experience and the apps I build at {e(site)}."></a>')
     out.append("</p>")
     readme = "\n".join(out)
-    # cache-bust every asset URL by the data date so GitHub's image proxy (camo) refetches
-    # on each refresh instead of serving a stale SVG (this is why updates weren't showing)
-    ver = stats.get("updated", "")
-    if ver:
-        readme = re.sub(r'(src="\./assets/[^"]+?)"', rf'\1?v={ver}"', readme)
+    # cache-bust each asset URL by its content hash so GitHub's image proxy (camo) refetches
+    # whenever a slice actually changes (theme swap, new data) — a date alone wouldn't bust a
+    # same-day change, which is why a theme switch kept showing the old, cached SVG.
+    import hashlib
+
+    def _ver(rel):
+        try:
+            return hashlib.md5((pathlib.Path("assets") / rel).read_bytes()).hexdigest()[:8]
+        except OSError:
+            return stats.get("updated", "x")
+
+    readme = re.sub(r'src="\./assets/([^"]+?)"',
+                    lambda m: f'src="./assets/{m.group(1)}?v={_ver(m.group(1))}"', readme)
     print(readme)
 
 
