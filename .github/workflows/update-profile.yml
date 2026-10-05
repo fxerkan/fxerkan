@@ -44,8 +44,8 @@ jobs:
       - name: Render SVGs
         run: python tools/profile/render.py          # contribution style rotates by day
 
-      - name: Update README
-        run: python tools/profile/readme.py
+      - name: Compose README
+        run: python tools/profile/compose_readme.py > README.md   # full regen + daily cache-bust
 
       - name: Build live demo gallery
         run: python tools/profile/build_demo.py       # docs/ — always-animated, theme-switchable (GitHub Pages)

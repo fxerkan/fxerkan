@@ -6,7 +6,7 @@ Stacks every rendered slice into one seamless console, mirroring the original
 layout: header, links row, stats, contribution-city, projects (2-up), stack,
 writing rows, footer. Content comes from profile.json + data/*.json.
 """
-import datetime, html, json, pathlib, sys
+import datetime, html, json, pathlib, re, sys
 
 HERE = pathlib.Path(__file__).resolve().parent
 DATA = HERE / "data"
@@ -89,7 +89,13 @@ def main():
     out.append(f'<a href="{e(site_url)}"><img src="./assets/footer.svg" width="100%" align="top" '
                f'alt="The rest of the story — full CV, certifications, experience and the apps I build at {e(site)}."></a>')
     out.append("</p>")
-    print("\n".join(out))
+    readme = "\n".join(out)
+    # cache-bust every asset URL by the data date so GitHub's image proxy (camo) refetches
+    # on each refresh instead of serving a stale SVG (this is why updates weren't showing)
+    ver = stats.get("updated", "")
+    if ver:
+        readme = re.sub(r'(src="\./assets/[^"]+?)"', rf'\1?v={ver}"', readme)
+    print(readme)
 
 
 if __name__ == "__main__":
