@@ -5,20 +5,20 @@
   "stars": 41,
   "forks": 1,
   "followers": 16,
-  "commits_year": 438,
-  "commits_all": 485,
+  "commits_year": 1173,
+  "commits_all": 1348,
   "prs": 101,
   "prs_merged": 78,
   "streak_current": 11,
   "streak_longest": 25,
   "hackathon_wins": 0,
   "languages": {
-    "Python": 3024871,
+    "Python": 3048516,
     "HTML": 980764,
     "JavaScript": 822235,
     "TypeScript": 281205,
     "CSS": 242137,
-    "Shell": 49795,
+    "Shell": 49879,
     "Kotlin": 29886,
     "Swift": 7560,
     "Dockerfile": 6584,
@@ -51,7 +51,7 @@
     "scoop-bucket": 0,
     "pironman-extended": 0,
     "ccbridger": 0,
-    "fxerkan-github": 0
+    "fxerkan": 0
   },
   "dev": {
     "articles": 2,
@@ -60,6 +60,6 @@
     "views": 107013,
     "followers": 13270
   },
-  "contributions_year": 1291,
-  "contributions_all": 1508
+  "contributions_year": 1298,
+  "contributions_all": 1515
 }
