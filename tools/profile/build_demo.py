@@ -19,12 +19,12 @@ import city_variants as V   # noqa: E402
 
 ROOT = HERE.parent.parent
 DOCS = ROOT / "docs"
-STYLES = ["cycle", "reactor", "terrain", "rally", "pulse", "circuit", "metropolis", "classic"]
-LABELS = {"cycle": "Cycle — all styles", "reactor": "Reactor", "terrain": "Terrain", "rally": "Rally",
-          "pulse": "Pulse (ECG)", "circuit": "Circuit", "metropolis": "Metropolis", "classic": "City"}
-BUILDERS = {"reactor": V.build_reactor, "terrain": V.build_terrain, "rally": V.build_rally,
-            "pulse": V.build_pulse, "circuit": V.build_circuit, "metropolis": V.build_metropolis,
-            "classic": R.build_city, "cycle": V.build_cycle}
+STYLES = ["cycle", "reactor", "metropolis", "circuit", "terrain", "classic", "rally"]
+LABELS = {"cycle": "Cycle — all styles", "reactor": "Reactor", "metropolis": "Metropolis",
+          "circuit": "Circuit", "terrain": "Terrain", "classic": "City", "rally": "Rally"}
+BUILDERS = {"reactor": V.build_reactor, "metropolis": V.build_metropolis, "circuit": V.build_circuit,
+            "terrain": V.build_terrain, "classic": R.build_city, "rally": V.build_rally,
+            "cycle": V.build_cycle}
 
 
 def page(themes):

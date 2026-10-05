@@ -21,7 +21,7 @@ cal = json.load(open("tools/profile/data/calendar.json"))
 stats = json.load(open("tools/profile/data/stats.json"))
 builders = {"classic": r.build_city, "metropolis": v.build_metropolis, "reactor": v.build_reactor,
             "circuit": v.build_circuit, "terrain": v.build_terrain, "rally": v.build_rally,
-            "pulse": v.build_pulse, "cycle": v.build_cycle}
+            "cycle": v.build_cycle}
 pathlib.Path("assets").mkdir(exist_ok=True)
 pathlib.Path("assets/contribution-city.svg").write_text(builders[os.environ["CITY"]](cal, stats["updated"]))
 print(f"rendered assets/contribution-city.svg [theme={os.environ['THEME']} city={os.environ['CITY']}]")

@@ -168,42 +168,40 @@ def build_header():
     name = hd["name"]
     lines = list(hd["lines"])
     brand = hd["brand"]
-    text = bar_left + bar_right + name + "$ whoami>>" + "".join(lines) + brand
-    h = 360
-    css = f"""@keyframes type{{from{{width:0}}}}
-@keyframes flicker{{0%{{opacity:0}}10%{{opacity:1}}14%{{opacity:.2}}22%{{opacity:1}}30%{{opacity:.4}}40%,100%{{opacity:1}}}}
+    text = bar_left + bar_right + name + ">>" + "".join(lines) + brand
+    h = 240
+    css = f"""@keyframes flicker{{0%{{opacity:0}}10%{{opacity:1}}14%{{opacity:.2}}22%{{opacity:1}}30%{{opacity:.4}}40%,100%{{opacity:1}}}}
 @keyframes gm{{0%,92%,100%{{transform:translate(0,0)}}93%{{transform:translate(5px,-1px)}}95%{{transform:translate(-3px,1px)}}97%{{transform:translate(2px,0)}}}}
 @keyframes gc{{0%,92%,100%{{transform:translate(0,0)}}93%{{transform:translate(-5px,1px)}}95%{{transform:translate(4px,-1px)}}97%{{transform:translate(-2px,0)}}}}
-.typing{{animation:type .7s steps(8) .3s both}}
 .name{{animation:flicker .9s linear 1.1s both}}
 .gm{{animation:gm 6s linear 2s infinite}}.gc{{animation:gc 6s linear 2s infinite}}"""
     defs = f"""<pattern id="scan" width="4" height="3" patternUnits="userSpaceOnUse"><rect width="4" height="1" fill="#000" fill-opacity=".2"/></pattern>
 <filter id="tglow" x="-5%" y="-40%" width="110%" height="180%"><feGaussianBlur stdDeviation="9"/></filter>
-<filter id="sglow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>
-<clipPath id="typeclip"><rect class="typing" x="{X}" y="80" width="140" height="30"/></clipPath>"""
+<filter id="sglow" x="-20%" y="-60%" width="140%" height="220%"><feGaussianBlur stdDeviation="3"/></filter>"""
     dotx = FR - 20 - len(bar_right) * 8.2 - 16
+    bl = (f'<tspan class="gr">$</tspan>&#160;<tspan class="cy">{e(bar_left[1:].strip())}</tspan>'
+          if bar_left.startswith("$") else f'<tspan class="cy">{e(bar_left)}</tspan>')
     rows = [f'<text class="fg" x="{X}" y="{{y}}"><tspan class="cy">&gt;&gt;</tspan> {e(lines[0])}</text>',
             f'<text class="fg" x="{X}" y="{{y}}"><tspan class="cy">&gt;&gt;</tspan> {e(lines[1])}</text>',
             f'<text class="fg" x="{X}" y="{{y}}"><tspan class="cy">&gt;&gt;</tspan> {e(lines[2])}<tspan class="cy" font-weight="700">{e(brand)}</tspan></text>']
-    desc_lines, _ = stagger(rows, 218, 24, delay0=1.75, step=0.25)
+    desc_lines, _ = stagger(rows, 150, 24, delay0=1.3, step=0.22)
     body = f'''<rect x="{FL}" y="{M}" width="{FR-FL}" height="34" fill="{CYAN}" fill-opacity=".08"/>
 <line x1="{FL}" y1="{M+34}" x2="{FR}" y2="{M+34}" stroke="{CYAN}" stroke-opacity=".5"/>
-<text x="{FL+16}" y="{M+22}" letter-spacing="1" class="cy" style="font-size:12px">{e(bar_left)}</text>
+<text x="{FL+16}" y="{M+22}" letter-spacing="1" style="font-size:12px">{bl}</text>
 <text x="{FR-20}" y="{M+22}" letter-spacing="1" class="dim" text-anchor="end" style="font-size:12px">{e(bar_right)}</text>
 <circle class="dot" cx="{dotx}" cy="{M+18}" r="4" fill="{GREEN}"/>
 <circle class="dot" cx="{dotx}" cy="{M+18}" r="4" fill="{GREEN}" filter="url(#sglow)"/>
-<g clip-path="url(#typeclip)"><text x="{X}" y="102" class="dim"><tspan class="gr">$</tspan> whoami</text></g>
 <g class="name" font-weight="800" letter-spacing="2" style="font-size:56px">
-<text x="{X}" y="172" fill="{CYAN}" opacity=".55" filter="url(#tglow)" style="font-size:56px">{name}</text>
-<g class="gm"><text x="{X+3}" y="172" fill="{MAGENTA}" opacity=".75" style="font-size:56px">{name}</text></g>
-<g class="gc"><text x="{X-3}" y="172" fill="{CYAN}" opacity=".85" style="font-size:56px">{name}</text></g>
-<text x="{X}" y="172" fill="#f0fbff" style="font-size:56px">{name}</text>
+<text x="{X}" y="112" fill="{CYAN}" opacity=".55" filter="url(#tglow)" style="font-size:56px">{name}</text>
+<g class="gm"><text x="{X+3}" y="112" fill="{MAGENTA}" opacity=".75" style="font-size:56px">{name}</text></g>
+<g class="gc"><text x="{X-3}" y="112" fill="{CYAN}" opacity=".85" style="font-size:56px">{name}</text></g>
+<text x="{X}" y="112" fill="#f0fbff" style="font-size:56px">{name}</text>
 </g>
 {desc_lines}
-<g class="ln" style="animation-delay:2.8s">
-<text x="{X}" y="304" class="gr">$</text>
-<rect class="cursor" x="{X+18}" y="291" width="10" height="17" fill="{CYAN}"/>
-<rect class="cursor" x="{X+18}" y="291" width="10" height="17" fill="{CYAN}" filter="url(#sglow)"/>
+<g class="ln" style="animation-delay:2.3s">
+<text x="{X}" y="224" class="gr">$</text>
+<rect class="cursor" x="{X+18}" y="211" width="10" height="17" fill="{CYAN}"/>
+<rect class="cursor" x="{X+18}" y="211" width="10" height="17" fill="{CYAN}" filter="url(#sglow)"/>
 </g>
 <rect x="{FL}" y="{M+35}" width="{FR-FL}" height="{h-M-35}" fill="url(#scan)"/>'''
     return slice_svg(h, body, title=name, desc=hd["desc"],
@@ -698,7 +696,7 @@ def main():
     ap.add_argument("--theme", default="cyberpunk", help="theme name from themes.json")
     ap.add_argument("--profile", type=pathlib.Path, default=HERE / "profile.json", help="profile.json")
     ap.add_argument("--city", default="rotate",
-                    choices=["classic", "metropolis", "reactor", "circuit", "terrain", "rally", "pulse", "cycle", "rotate"],
+                    choices=["classic", "metropolis", "reactor", "circuit", "terrain", "rally", "cycle", "rotate"],
                     help="contribution rendering: a specific one, cycle (all cross-fading), or rotate (a different one each day)")
     args = ap.parse_args()
     OUT = args.out
@@ -716,14 +714,14 @@ def main():
     cities = {"classic": build_city, "metropolis": city_variants.build_metropolis,
               "reactor": city_variants.build_reactor, "circuit": city_variants.build_circuit,
               "terrain": city_variants.build_terrain, "rally": city_variants.build_rally,
-              "pulse": city_variants.build_pulse, "cycle": city_variants.build_cycle}
+              "cycle": city_variants.build_cycle}
     write("header.svg", build_header())
     write("links.svg", build_links_head())
     for k, (key, *_) in enumerate(LINKS):
         write(f"links/{'dev' if key == 'devdotto' else key}.svg", build_link_button(k))
     write("stats.svg", build_stats(stats))
     # rotate = pick a different style each day, so the static profile image still changes over time
-    rotation = ["reactor", "terrain", "rally", "pulse", "metropolis", "classic", "circuit"]
+    rotation = ["reactor", "metropolis", "circuit", "terrain", "classic", "rally"]
     city = rotation[datetime.date.today().toordinal() % len(rotation)] if args.city == "rotate" else args.city
     if (args.data / "calendar.json").exists():
         write("contribution-city.svg", cities[city](json.load(open(args.data / "calendar.json")), stats["updated"]))

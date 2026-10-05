@@ -25,11 +25,13 @@ def main():
     site = hd.get("brand", "fxerkan.com")
     site_url = site if site.startswith("http") else f"https://{site}"
     demo_url = prof.get("demo_url", "https://fxerkan.github.io/fxerkan/")
+    gh_url = f"https://github.com/{prof['username']}"
+    medium_url = f"https://medium.com/@{prof.get('medium_user', prof['username'])}"
     # header image is a link to the site (clicking opens fxerkan.com, not the raw SVG)
     out.append(f'<a href="{e(site_url)}"><img src="./assets/header.svg" width="100%" align="top" alt="{e(hd["desc"])}"></a>')
 
     # 01 — projects (pinned repos), 2-up
-    out.append('<img src="./assets/projects.svg" width="100%" align="top" alt="Projects — pinned repositories">')
+    out.append(f'<a href="{e(gh_url)}?tab=repositories"><img src="./assets/projects.svg" width="100%" align="top" alt="Projects — pinned repositories"></a>')
     cards = []
     for p in prof["projects"]:
         alt = f'{p["name"]} — {p["tag"]}. {p["desc"]} {p["stack"].replace(" · ", ", ")}.'
@@ -55,11 +57,11 @@ def main():
             f'{stats.get("contributions_all", 0)} all time; {stats["prs"]} pull requests ({stats["prs_merged"]} merged); '
             f'current streak {stats["streak_current"]} days, longest {stats["streak_longest"]}; {stats["followers"]} followers; '
             f'member since {since:%B %Y}. Top languages: {langs}.')
-    out.append(f'<img src="./assets/stats.svg" width="100%" align="top" alt="Stats: {e(salt)}">')
+    out.append(f'<a href="{e(gh_url)}"><img src="./assets/stats.svg" width="100%" align="top" alt="Stats: {e(salt)}"></a>')
 
     # 04 — writing (canonical links point to Medium; cross-posted to DEV and coderlegion)
     if articles:
-        out.append('<img src="./assets/writing.svg" width="100%" align="top" alt="Writing — articles on Medium, DEV and coderlegion">')
+        out.append(f'<a href="{e(medium_url)}"><img src="./assets/writing.svg" width="100%" align="top" alt="Writing — articles on Medium, DEV and coderlegion"></a>')
         out.append("<!-- writing:start -->")
         for i, a in enumerate(articles[:5], 1):
             alt = (f'{a["title"]} — published {a["published_at"][:10]}, '
@@ -71,10 +73,10 @@ def main():
 
     # 05 — stack
     sdesc = "Tech stack. " + " ".join(f"{c}: {', '.join(items)}." for c, items in prof["stack"])
-    out.append(f'<img src="./assets/stack.svg" width="100%" align="top" alt="{e(sdesc)}">')
+    out.append(f'<a href="{e(site_url)}"><img src="./assets/stack.svg" width="100%" align="top" alt="{e(sdesc)}"></a>')
 
     # 06 — links / where to find me
-    out.append('<img src="./assets/links.svg" width="100%" align="top" alt="Links — where to find me">')
+    out.append(f'<a href="{e(site_url)}"><img src="./assets/links.svg" width="100%" align="top" alt="Links — where to find me"></a>')
     link_row = []
     for key, label, handle, url in links:
         fn = "dev" if key == "devdotto" else key

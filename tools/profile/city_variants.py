@@ -549,8 +549,9 @@ def build_terrain(calendar, updated, as_parts=False):
 
 # ═══════════════════════════════ 6 · rally ════════════════════════════════════
 def build_rally(calendar, updated, as_parts=False):
-    """A rally stage: the year's profile is the road; a car drives its climbs and drops,
-    the surface (gravel / tarmac / snow) coloured by how busy each day was."""
+    """An isometric rally stage: the year is a switchback mountain road the car drives,
+    carved into the slope — each day a stretch, its elevation (a ramp) and surface
+    (gravel / tarmac / snow) set by how busy the day was. Like a top-down arcade racer."""
     CY, MG, GR, AM, VI, BG = R.CYAN, R.MAGENTA, R.GREEN, R.AMBER, R.VIOLET, R.BG
     FL, FR, X = R.FL, R.FR, R.X
     days = _days(calendar)
@@ -560,118 +561,88 @@ def build_rally(calendar, updated, as_parts=False):
     active = sum(1 for n in counts if n)
     busiest_i, (busiest_d, busiest_n) = max(enumerate(days), key=lambda t: t[1][1])
     N = len(days)
-    base, amp, W0, W1 = 538, 300, FL + 8, FR - 8
-    pts = [(W0 + (W1 - W0) * i / (N - 1), base - amp * math.sqrt(n / peak)) for i, (d, n) in enumerate(days)]
-    road_d = "M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in pts)
-    fill_d = f"M{W0} {base+124}" + "".join(f"L{x:.1f} {y:.1f}" for x, y in pts) + f"L{W1} {base+124}Z"
-    surf = {0: AM, 1: AM, 2: "#2a3340", 3: R.WIN_ON}
-    segs = []
-    for i in range(N - 1):
-        (x1, y1), (x2, y2) = pts[i], pts[i + 1]
-        lvl = sum(days[i][1] > t for t in lv) if days[i][1] else 0
-        segs.append(f'<line x1="{x1:.1f}" y1="{y1:.1f}" x2="{x2:.1f}" y2="{y2:.1f}" stroke="{surf[lvl]}" stroke-width="5" stroke-linecap="round"/>')
-    centerline = f'<path d="{road_d}" fill="none" stroke="{BG}" stroke-width="1" stroke-dasharray="6 8" opacity=".5"/>'
-    car = (f'<g><g transform="translate(-9 -7)">'
-           f'<path d="M0 8L3 2H13L18 6V10H0Z" fill="{MG}"/><rect x="4" y="0" width="7" height="4" fill="{CY}"/>'
-           f'<circle cx="4.5" cy="11" r="2.4" fill="#0b0d12"/><circle cx="14.5" cy="11" r="2.4" fill="#0b0d12"/></g>'
-           f'<animateMotion dur="15s" repeatCount="indefinite" rotate="auto" path="{road_d}"/></g>')
-    fx = W1
-    finish = (f'<rect x="{fx-4:.0f}" y="{base-amp-14:.0f}" width="4" height="{amp+138:.0f}" fill="#6e7681" opacity=".45"/>'
-              + "".join(f'<rect x="{fx-4:.0f}" y="{base-amp-14+j*8:.0f}" width="4" height="4" fill="{"#f0f6fc" if j%2 else "#0b0d12"}"/>' for j in range(7)))
-    px, py = pts[busiest_i]
-    peak = (f'<line x1="{px:.1f}" y1="{py:.1f}" x2="{px:.1f}" y2="{py-30:.1f}" stroke="{AM}" stroke-width="1.4"/><path d="M{px:.1f} {py-30:.1f}l15 5-15 5Z" fill="{AM}"/>'
-            f'<text x="{px+20:.1f}" y="{py-26:.1f}" font-weight="800" fill="{AM}" letter-spacing="1" style="font-size:12px">KING STAGE</text>'
-            f'<text x="{px+20:.1f}" y="{py-12:.1f}" class="dim" style="font-size:11px">{busiest_d:%b %-d} · {busiest_n}</text>')
+
+    L, x0, roadW = 5, FL + 60, FR - FL - 150
+    laneTop, laneDY, isoTilt, amp, RW = 182, 92, 34, 54, 15
+    per = N / L
+
+    surf, base, lanes = [], [], [[] for _ in range(L)]
+    for i in range(N):
+        lane = min(L - 1, int(i // per))
+        t = (i - lane * per) / per
+        u = t if lane % 2 == 0 else 1 - t                      # snake: alternate direction each lane
+        gx = x0 + u * roadW
+        gy = laneTop + lane * laneDY + u * isoTilt             # iso skew → each switchback tilts
+        z = amp * math.sqrt(days[i][1] / peak) if days[i][1] else 0
+        surf.append((gx, gy - z))
+        base.append((gx, gy))
+        lanes[lane].append((gx, gy))
+    road_d = "M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in surf)
+
+    # mountainside mass under each switchback (drawn back-to-front)
+    ground = []
+    for lane in range(L):
+        lp = lanes[lane]
+        if not lp:
+            continue
+        top = "".join(f"L{x:.1f} {y:.1f}" for x, y in lp)
+        ground.append(f'<path d="M{lp[0][0]:.1f} {lp[0][1]:.1f}{top}L{lp[-1][0]:.1f} {lp[-1][1]+laneDY+30:.1f}L{lp[0][0]:.1f} {lp[0][1]+laneDY+30:.1f}Z" fill="url(#g_hill)" opacity="{.45+.11*lane:.2f}"/>')
+    # elevation walls (the ramps/cliffs the road rides over)
+    walls = "".join(f'<path d="M{surf[i][0]:.1f} {surf[i][1]:.1f}L{surf[i+1][0]:.1f} {surf[i+1][1]:.1f}L{base[i+1][0]:.1f} {base[i+1][1]+RW/2:.1f}L{base[i][0]:.1f} {base[i][1]+RW/2:.1f}Z" fill="{R.FACE_R}"/>'
+                    for i in range(N - 1) if days[i][1] or days[i + 1][1])
+    # road surface, coloured by intensity (gravel / tarmac / snow)
+    surf_c = {0: AM, 1: AM, 2: "#3a4654", 3: R.WIN_ON}
+    segs = "".join(f'<line x1="{surf[i][0]:.1f}" y1="{surf[i][1]:.1f}" x2="{surf[i+1][0]:.1f}" y2="{surf[i+1][1]:.1f}" stroke="{surf_c[sum(days[i][1]>t for t in lv) if days[i][1] else 0]}" stroke-width="{RW}" stroke-linecap="round"/>'
+                   for i in range(N - 1))
+    centerline = f'<path d="{road_d}" fill="none" stroke="{BG}" stroke-width="1.4" stroke-dasharray="7 10" opacity=".5"/>'
+
+    car = (f'<g><g transform="translate(-10 -6)">'
+           f'<path d="M0 8L4 2H14L19 6V11H0Z" fill="{MG}"/><rect x="5" y="0" width="7" height="4" fill="{CY}"/>'
+           f'<circle cx="5" cy="12" r="2.5" fill="#0b0d12"/><circle cx="15" cy="12" r="2.5" fill="#0b0d12"/>'
+           f'<circle cx="5" cy="12" r="2.5" fill="none" stroke="{CY}" stroke-width=".7"/><circle cx="15" cy="12" r="2.5" fill="none" stroke="{CY}" stroke-width=".7"/></g>'
+           f'<animateMotion dur="22s" repeatCount="indefinite" rotate="auto" path="{road_d}"/></g>')
+
+    px, py = surf[busiest_i]
+    right = px < FR - 190
+    lxx, anc, flag = (px + 20, "start", "l15 5-15 5Z") if right else (px - 20, "end", "l-15 5 15 5Z")
+    peak = (f'<line x1="{px:.1f}" y1="{py:.1f}" x2="{px:.1f}" y2="{py-30:.1f}" stroke="{AM}" stroke-width="1.4"/><path d="M{px:.1f} {py-30:.1f}{flag}" fill="{AM}"/>'
+            f'<circle class="beacon" cx="{px:.1f}" cy="{py:.1f}" r="3.4" fill="{MG}" filter="url(#g)"/>'
+            f'<text x="{lxx:.1f}" y="{py-26:.1f}" text-anchor="{anc}" font-weight="800" fill="{AM}" letter-spacing="1" style="font-size:12px">KING STAGE</text>'
+            f'<text x="{lxx:.1f}" y="{py-12:.1f}" text-anchor="{anc}" class="dim" style="font-size:11px">{busiest_d:%b %-d} · {busiest_n}</text>')
+
+    sunx, suny = FR - 120, 150
+    hills = (f'<path d="M{FL+120} 250L{FL+260} 120L{FL+400} 250Z" fill="url(#g_hill)" opacity=".3"/>'
+             f'<path d="M{FL+340} 250L{FL+500} 100L{FL+660} 250Z" fill="url(#g_hill)" opacity=".25"/>')
     rx = FR - 36
     read = [("STAGE", "365d"), ("FASTEST", f"{busiest_n}"), ("DRIVEN", f"{active}d")]
-    hud = "".join(f'<text x="{rx}" y="{150+i*46}" text-anchor="end" letter-spacing="1.5" class="dim" style="font-size:10px">{k}</text>'
-                  f'<text x="{rx}" y="{150+i*46+21}" text-anchor="end" font-weight="800" class="wh" style="font-size:19px">{v}</text>'
+    hud = "".join(f'<text x="{rx}" y="{212+i*48}" text-anchor="end" letter-spacing="1.5" class="dim" style="font-size:10px">{k}</text>'
+                  f'<text x="{rx}" y="{212+i*48+22}" text-anchor="end" font-weight="800" class="wh" style="font-size:19px">{v}</text>'
                   for i, (k, v) in enumerate(read))
-    leg = (f'<rect x="{X}" y="628" width="11" height="11" fill="{AM}"/><text x="{X+16}" y="638" class="dim" style="font-size:11px">gravel</text>'
-           f'<rect x="{X+92}" y="628" width="11" height="11" fill="#2a3340"/><text x="{X+108}" y="638" class="dim" style="font-size:11px">tarmac</text>'
-           f'<rect x="{X+186}" y="628" width="11" height="11" fill="{R.WIN_ON}"/><text x="{X+202}" y="638" class="dim" style="font-size:11px">snow</text>')
+    leg = (f'<rect x="{X}" y="644" width="11" height="11" fill="{AM}"/><text x="{X+16}" y="654" class="dim" style="font-size:11px">gravel</text>'
+           f'<rect x="{X+92}" y="644" width="11" height="11" fill="#3a4654"/><text x="{X+108}" y="654" class="dim" style="font-size:11px">tarmac</text>'
+           f'<rect x="{X+186}" y="644" width="11" height="11" fill="{R.WIN_ON}"/><text x="{X+202}" y="654" class="dim" style="font-size:11px">snow</text>')
     body = R.heading(44, "contribution-rally", "// 02") + f'''
-<g class="ln" style="animation-delay:.15s"><text x="{X}" y="96" class="dim"><tspan class="gr">$</tspan> rally --stage WRC <tspan fill="#484f58"># drive the year, surface = intensity</tspan></text></g>
-<path d="{fill_d}" fill="url(#g_rally)"/>
-{"".join(segs)}
+<g class="ln" style="animation-delay:.15s"><text x="{X}" y="96" class="dim"><tspan class="gr">$</tspan> rally --iso --stage WRC <tspan fill="#484f58"># switchbacks down the mountain, surface = intensity</tspan></text></g>
+<circle cx="{sunx}" cy="{suny}" r="40" fill="url(#sunglow)"/><circle cx="{sunx}" cy="{suny}" r="16" fill="{AM}" opacity=".85"/>
+{hills}
+<g>{"".join(ground)}</g>
+<g>{walls}</g>
+<g>{segs}</g>
 {centerline}
-{finish}
 {peak}
 {car}
 {hud}
 {leg}'''
-    css = "@keyframes beaconb{0%,84%,100%{opacity:1}42%{opacity:.12}}"
-    defs = f'<linearGradient id="g_rally" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{R.FACE_R}" stop-opacity=".7"/><stop offset="1" stop-color="{BG}"/></linearGradient>'
-    desc = (f"Contribution rally: the year's activity profile as a rally stage road a car drives, surfaces coloured by intensity "
-            f"(gravel, tarmac, snow). {total:,} contributions, fastest split {busiest_d:%B} {busiest_d.day} with {busiest_n}.")
-    text = ("~/contribution-rally// 02$ rally --stage WRC # drive the year, surface = intensity"
+    css = "@keyframes beaconb{0%,84%,100%{opacity:1}42%{opacity:.12}}.beacon{animation:beaconb 1.6s ease-in-out infinite}"
+    defs = (f'<linearGradient id="g_hill" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{R.ROOFS[1]}" stop-opacity=".9"/><stop offset="1" stop-color="{BG}"/></linearGradient>'
+            f'<radialGradient id="sunglow"><stop offset="0" stop-color="{AM}" stop-opacity=".5"/><stop offset="1" stop-color="{AM}" stop-opacity="0"/></radialGradient>')
+    desc = (f"Contribution rally: the year as an isometric switchback mountain road a car drives, each day a stretch whose ramp and "
+            f"surface (gravel, tarmac, snow) track that day's activity. {total:,} contributions, toughest climb {busiest_d:%B} {busiest_d.day} with {busiest_n}.")
+    text = ("~/contribution-rally// 02$ rally --iso --stage WRC # switchbacks down the mountain, surface = intensity"
             "STAGE FASTEST DRIVEN KING gravel tarmac snow JanFebMarAprMayJunJulAugSepOctNovDec")
     if as_parts:
         return body, css, defs, text
     return R.slice_svg(680, body, title="Contribution rally", desc=desc, text=text, css=css, defs=defs)
-
-
-# ═══════════════════════════════ 7 · pulse ════════════════════════════════════
-def build_pulse(calendar, updated, as_parts=False):
-    """A vitals monitor: the year as an ECG trace — a spike per busy day, a beat sweeping across."""
-    CY, MG, GR, AM, VI, BG = R.CYAN, R.MAGENTA, R.GREEN, R.AMBER, R.VIOLET, R.BG
-    FL, FR, X = R.FL, R.FR, R.X
-    days = _days(calendar)
-    counts = [n for _, n in days]
-    total, peak = sum(counts), max(counts) if counts else 1
-    active = sum(1 for n in counts if n)
-    busiest_i, (busiest_d, busiest_n) = max(enumerate(days), key=lambda t: t[1][1])
-    N = len(days)
-    W0, W1, cen, amp = FL + 36, FR - 150, 414, 176
-    P = [(W0, cen)]
-    for i, (d, n) in enumerate(days):
-        x = W0 + (W1 - W0) * i / (N - 1)
-        if not n:
-            P.append((x, cen))
-        else:
-            h = amp * math.sqrt(n / peak)
-            P += [(x - 2, cen), (x - 0.8, cen + h * 0.16), (x, cen - h), (x + 0.9, cen + h * 0.3), (x + 2, cen)]
-    P.append((W1, cen))
-    trace = "M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in P)
-    grid = "".join(f'<line x1="{gx}" y1="150" x2="{gx}" y2="602" stroke="{GR}" stroke-opacity=".06"/>' for gx in range(int(W0), int(W1), 26))
-    grid += "".join(f'<line x1="{W0}" y1="{gy}" x2="{W1}" y2="{gy}" stroke="{GR}" stroke-opacity=".06"/>' for gy in range(166, 602, 26))
-    beat = f'<circle r="4.2" fill="#eafff2" filter="url(#g)"><animateMotion dur="9s" repeatCount="indefinite" path="{trace}"/></circle>'
-    sweep = f'<line class="scan" x1="{W0}" y1="156" x2="{W0}" y2="600" stroke="{GR}" stroke-opacity=".5" stroke-width="2" filter="url(#g)"/>'
-    px, py = W0 + (W1 - W0) * busiest_i / (N - 1), cen - amp * math.sqrt(busiest_n / peak)
-    peak = (f'<circle class="beacon" cx="{px:.1f}" cy="{py:.1f}" r="4" fill="{AM}" filter="url(#g)"/>'
-            f'<text x="{px:.1f}" y="{py-10:.1f}" text-anchor="middle" font-weight="800" fill="{AM}" letter-spacing="1" style="font-size:12px">PEAK</text>'
-            f'<text x="{px:.1f}" y="{py-24:.1f}" text-anchor="middle" class="dim" style="font-size:10px">{busiest_d:%b %-d} · {busiest_n}</text>')
-    heart = (f'<g class="hb" style="transform-origin:{W0+10}px 118px"><path transform="translate({W0} 108) scale(1.4)" d="{R.HEART}" fill="{MG}"/></g>'
-             f'<text x="{W0+34}" y="122" class="gr" font-weight="700" style="font-size:15px">{active}</text>'
-             f'<text x="{W0+34}" y="122" class="dim" style="font-size:15px" dx="{len(str(active))*9+4}"> active beats / 365</text>')
-    rx = FR - 36
-    read = [("PEAK/DAY", f"{busiest_n}"), ("ACTIVE", f"{active}d"), ("TOTAL", f"{total:,}")]
-    hud = "".join(f'<text x="{rx}" y="{172+i*50}" text-anchor="end" letter-spacing="1.5" class="dim" style="font-size:10px">{k}</text>'
-                  f'<text x="{rx}" y="{172+i*50+23}" text-anchor="end" font-weight="800" class="gr" style="font-size:21px">{v}</text>'
-                  for i, (k, v) in enumerate(read))
-    body = R.heading(44, "contribution-pulse", "// 02") + f'''
-<g class="ln" style="animation-delay:.15s"><text x="{X}" y="96" class="dim"><tspan class="gr">$</tspan> vitals --ecg 365d <tspan fill="#484f58"># one beat per day, spikes are busy days</tspan></text></g>
-<g>{grid}</g>
-{heart}
-<path d="{trace}" fill="none" stroke="{GR}" stroke-opacity=".3" stroke-width="2"/>
-<path d="{trace}" fill="none" stroke="{GR}" stroke-width="2" filter="url(#g)" opacity=".6"/>
-<path d="{trace}" fill="none" stroke="{R.WIN_ON if False else GR}" stroke-width="1.6"/>
-{sweep}
-{peak}
-{beat}
-{hud}'''
-    css = """@keyframes scan{from{transform:translateX(0)}to{transform:translateX(""" + f"{W1-W0:.0f}" + """px)}}
-@keyframes hb{0%,100%{transform:scale(1)}15%{transform:scale(1.22)}30%{transform:scale(1)}}
-@keyframes beaconb{0%,84%,100%{opacity:1}42%{opacity:.12}}
-.scan{animation:scan 9s linear infinite}.hb{animation:hb 1.3s ease-in-out infinite}.beacon{animation:beaconb 1.6s ease-in-out infinite}"""
-    defs = ""
-    desc = (f"Contribution pulse: the last year as an ECG vitals trace, a tall spike for each busy day and a beat sweeping across. "
-            f"{total:,} contributions, {active} active days, strongest beat {busiest_d:%B} {busiest_d.day} with {busiest_n}.")
-    text = ("~/contribution-pulse// 02$ vitals --ecg 365d # one beat per day, spikes are busy days"
-            "PEAK/DAY ACTIVE TOTAL active beats / 365 JanFebMarAprMayJunJulAugSepOctNovDec")
-    if as_parts:
-        return body, css, defs, text
-    return R.slice_svg(680, body, title="Contribution pulse", desc=desc, text=text, css=css, defs=defs)
 
 
 # ═══════════════════════════ cycle (all views in one) ═════════════════════════
@@ -683,8 +654,8 @@ def build_cycle(calendar, updated):
     overlap between views are near-identical (the city's window code is reused), so a
     plain concat is safe; the only id clash is the shared moon gradient (first wins).
     """
-    views = [("cycA", build_reactor), ("cycB", build_terrain), ("cycC", build_rally),
-             ("cycD", build_pulse), ("cycE", build_circuit), ("cycF", build_metropolis), ("cycG", R.build_city)]
+    views = [("cycA", build_reactor), ("cycB", build_metropolis), ("cycC", build_circuit),
+             ("cycD", build_terrain), ("cycE", R.build_city), ("cycF", build_rally)]
     groups, csss, defss, texts = [], [], [], []
     for cls, fn in views:
         b, c, d, t = fn(calendar, updated, as_parts=True)
@@ -692,24 +663,23 @@ def build_cycle(calendar, updated):
         csss.append(c)
         defss.append(d)
         texts.append(t)
-    cyc_css = """@keyframes cycA{0%{opacity:1}14%{opacity:1}16%{opacity:0}98%{opacity:0}100%{opacity:1}}
-@keyframes cycB{0%{opacity:0}12%{opacity:0}14%{opacity:1}29%{opacity:1}31%{opacity:0}100%{opacity:0}}
-@keyframes cycC{0%{opacity:0}27%{opacity:0}29%{opacity:1}43%{opacity:1}45%{opacity:0}100%{opacity:0}}
-@keyframes cycD{0%{opacity:0}41%{opacity:0}43%{opacity:1}57%{opacity:1}59%{opacity:0}100%{opacity:0}}
-@keyframes cycE{0%{opacity:0}55%{opacity:0}57%{opacity:1}71%{opacity:1}73%{opacity:0}100%{opacity:0}}
-@keyframes cycF{0%{opacity:0}69%{opacity:0}71%{opacity:1}86%{opacity:1}88%{opacity:0}100%{opacity:0}}
-@keyframes cycG{0%{opacity:0}84%{opacity:0}86%{opacity:1}100%{opacity:1}}
-.cyc{animation-duration:70s;animation-iteration-count:infinite;animation-timing-function:ease-in-out;opacity:0}
-.cycA{animation-name:cycA;opacity:1}.cycB{animation-name:cycB}.cycC{animation-name:cycC}.cycD{animation-name:cycD}.cycE{animation-name:cycE}.cycF{animation-name:cycF}.cycG{animation-name:cycG}"""
+    cyc_css = """@keyframes cycA{0%{opacity:1}17%{opacity:1}19%{opacity:0}98%{opacity:0}100%{opacity:1}}
+@keyframes cycB{0%{opacity:0}15%{opacity:0}17%{opacity:1}33%{opacity:1}35%{opacity:0}100%{opacity:0}}
+@keyframes cycC{0%{opacity:0}31%{opacity:0}33%{opacity:1}50%{opacity:1}52%{opacity:0}100%{opacity:0}}
+@keyframes cycD{0%{opacity:0}48%{opacity:0}50%{opacity:1}67%{opacity:1}69%{opacity:0}100%{opacity:0}}
+@keyframes cycE{0%{opacity:0}65%{opacity:0}67%{opacity:1}83%{opacity:1}85%{opacity:0}100%{opacity:0}}
+@keyframes cycF{0%{opacity:0}81%{opacity:0}83%{opacity:1}100%{opacity:1}}
+.cyc{animation-duration:60s;animation-iteration-count:infinite;animation-timing-function:ease-in-out;opacity:0}
+.cycA{animation-name:cycA;opacity:1}.cycB{animation-name:cycB}.cycC{animation-name:cycC}.cycD{animation-name:cycD}.cycE{animation-name:cycE}.cycF{animation-name:cycF}"""
     total = sum(n for _, n in calendar)
     return R.slice_svg(680, "".join(groups), title="Contribution — cycling views",
-                       desc=("Contribution activity for the last year, cycling between a reactor, a mountain terrain, a rally stage, "
-                             f"an ECG pulse, a circuit board, a neon metropolis and an isometric city. {total:,} contributions."),
+                       desc=("Contribution activity for the last year, cycling between a reactor, a neon metropolis, a circuit board, "
+                             f"a mountain terrain, an isometric city and an isometric rally stage. {total:,} contributions."),
                        text="".join(texts), css="\n".join(csss + [cyc_css]), defs="".join(defss))
 
 
 BUILDERS = {"reactor": build_reactor, "metropolis": build_metropolis, "circuit": build_circuit,
-            "terrain": build_terrain, "rally": build_rally, "pulse": build_pulse, "cycle": build_cycle}
+            "terrain": build_terrain, "rally": build_rally, "cycle": build_cycle}
 
 
 if __name__ == "__main__":  # smoke test: every variant renders against the real data

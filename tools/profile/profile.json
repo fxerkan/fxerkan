@@ -3,7 +3,7 @@
   "dev_user": "fxerkan",
   "header": {
     "name": "FXERKAN",
-    "bar_left": "SYS://FXERKAN // NODE:ERKAN",
+    "bar_left": "$ whoami",
     "lines": [
       "Data & AI Architect · builder of tools",
       "\"Code more, worry less.\"",
