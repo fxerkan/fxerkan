@@ -69,49 +69,49 @@
     "bar_right": "DRS ENABLED · TYRES GREEN · P1"
   },
   "johnwick": {
-    "label": "John Wick — Continental teal / blood",
-    "accent": "#1fc8c0",
-    "accent2": "#ff2d4a",
-    "accent3": "#d9a21a",
-    "amber": "#e0a526",
-    "violet": "#6c8cff",
-    "bg": "#05070b",
+    "label": "John Wick — neon blue / hot pink",
+    "accent": "#2f8fff",
+    "accent2": "#ff1f9e",
+    "accent3": "#35d6ff",
+    "amber": "#ff2bd6",
+    "violet": "#7b5cff",
+    "bg": "#070a1a",
     "roofs": [
-      "#0a3a3c",
-      "#126a68",
-      "#19b0a8",
-      "#45f0e2"
+      "#141c52",
+      "#1e3aa8",
+      "#2f6bff",
+      "#39d6ff"
     ],
-    "win_on": "#a6fff6",
-    "win_on_side": "#2ad1c9",
-    "win_off": "#0a1618",
-    "face_l": "#0f2226",
-    "face_r": "#0a171a",
-    "empty_day": "#0d1517",
-    "empty_stroke": "#060b0c",
-    "bar_right": "THE CONTINENTAL · SERVICES RENDERED"
+    "win_on": "#dbeef7",
+    "win_on_side": "#35c6f4",
+    "win_off": "#0e1430",
+    "face_l": "#15204a",
+    "face_r": "#0e1636",
+    "empty_day": "#0d1430",
+    "empty_stroke": "#070a1a",
+    "bar_right": "THE CONTINENTAL · NEW YORK"
   },
-  "lightsaber": {
-    "label": "Lightsaber — Jedi blue / Sith red",
-    "accent": "#36a7ff",
-    "accent2": "#ff2b2b",
-    "accent3": "#33ff5e",
-    "amber": "#ffd24a",
-    "violet": "#b36bff",
-    "bg": "#010309",
+  "mandalorian": {
+    "label": "Star Wars — Mandalorian / Boba Fett",
+    "accent": "#c7912a",
+    "accent2": "#d2691e",
+    "accent3": "#6d9b94",
+    "amber": "#e0a526",
+    "violet": "#5a7a86",
+    "bg": "#121009",
     "roofs": [
-      "#0a2a5a",
-      "#1550b0",
-      "#2f8fff",
-      "#9ad4ff"
+      "#3a2d16",
+      "#7a5a1e",
+      "#c7912a",
+      "#e8c878"
     ],
-    "win_on": "#eaf6ff",
-    "win_on_side": "#5bb8ff",
-    "win_off": "#0a1424",
-    "face_l": "#0e1b36",
-    "face_r": "#0a1428",
-    "empty_day": "#0a1020",
-    "empty_stroke": "#05080f",
-    "bar_right": "MAY THE FORCE BE WITH YOU"
+    "win_on": "#efe8c6",
+    "win_on_side": "#c7912a",
+    "win_off": "#241c10",
+    "face_l": "#2a2112",
+    "face_r": "#1e1710",
+    "empty_day": "#1c1710",
+    "empty_stroke": "#0e0b06",
+    "bar_right": "BOUNTY GUILD · THIS IS THE WAY"
   }
 }
