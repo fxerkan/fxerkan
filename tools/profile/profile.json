@@ -1,0 +1,48 @@
+{
+  "username": "fxerkan",
+  "dev_user": "fxerkan",
+  "header": {
+    "name": "FXERKAN",
+    "bar_left": "SYS://FXERKAN // NODE:ERKAN",
+    "lines": [
+      "Data & AI Architect · builder of tools",
+      "\"Code more, worry less.\"",
+      "open-source · "
+    ],
+    "brand": "fxerkan.com",
+    "desc": "FXerkan — Erkan Ciftci. Data & AI Architect. Code more, worry less. Open-source tools at fxerkan.com."
+  },
+  "links": [
+    ["github", "GitHub", "@fxerkan", "https://github.com/fxerkan"],
+    ["linkedin", "LinkedIn", "in/erkanciftci", "https://www.linkedin.com/in/erkanciftci/"],
+    ["devdotto", "DEV", "@fxerkan", "https://dev.to/fxerkan"],
+    ["web", "Website", "fxerkan.com", "https://fxerkan.com"]
+  ],
+  "projects": [
+    {"slug": "concealer", "name": "Concealer", "url": "https://github.com/fxerkan/concealer",
+     "tag": "MCP · SECURITY", "tag_color": "a3", "stars": 15, "stack": "Python · MCP · Encryption",
+     "desc": "Local-only AI secret manager for the AI-coding era. MCP, CLI, Web, TUI. No cloud, no telemetry."},
+    {"slug": "my_network_scanner", "name": "My Network Scanner", "url": "https://github.com/fxerkan/my_network_scanner",
+     "tag": "SELF-HOSTED", "tag_color": "a2", "stars": 11, "stack": "Python · Flask · MQTT",
+     "desc": "See every device on your home network - Zigbee, Z-Wave, Matter and BLE an IP scan can't find."},
+    {"slug": "headroom-stats", "name": "Headroom Stats", "url": "https://github.com/fxerkan/headroom-stats",
+     "tag": "AI TOOLING", "tag_color": "a3", "stars": 1, "stack": "JavaScript · VS Code · CLI",
+     "desc": "LLM token-savings dashboard: per-project, per-model, prefix-cache and RTK savings for AI agents."},
+    {"slug": "pironman_grafana_dashboard", "name": "Pironman Dashboard", "url": "https://github.com/fxerkan/pironman_grafana_dashboard",
+     "tag": "HOMELAB", "tag_color": "a2", "stars": 10, "stack": "Grafana · Prometheus · Shell",
+     "desc": "A Grafana dashboard for Pironman 5 - live temps, fan, CPU, disk and power at a glance."},
+    {"slug": "commit-grapher", "name": "commit-grapher", "url": "https://github.com/fxerkan/commit-grapher",
+     "tag": "DEV TOOLING", "tag_color": "a3", "stars": 0, "stack": "TypeScript · Git · CLI",
+     "desc": "Your git history, deanonymized - every commit, branch and PR across all your accounts in one dashboard."},
+    {"slug": "ccbridger", "name": "ccbridger", "url": "https://github.com/fxerkan/ccbridger",
+     "tag": "CLAUDE CODE", "tag_color": "a2", "stars": 0, "stack": "Python · Bedrock · Vertex",
+     "desc": "Remote control for API-based Claude Code - approve and steer terminal sessions from your phone."}
+  ],
+  "stack": [
+    ["languages", ["Python", "TypeScript", "JavaScript", "SQL", "Shell"]],
+    ["ai / data", ["LLMs", "MCP", "Airflow", "Spark", "dbt"]],
+    ["cloud", ["AWS", "GCP", "Azure"]],
+    ["data stores", ["PostgreSQL", "Redis", "BigQuery", "InfluxDB"]],
+    ["devops", ["Docker", "Grafana", "Raspberry Pi", "Home Assistant"]]
+  ]
+}
