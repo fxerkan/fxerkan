@@ -693,7 +693,7 @@ def main():
     ap = argparse.ArgumentParser(description="Render the profile SVGs from data/*.json.")
     ap.add_argument("--data", type=pathlib.Path, default=DATA, help="folder with stats.json and articles.json")
     ap.add_argument("--out", type=pathlib.Path, default=OUT, help="folder to write the SVGs into")
-    ap.add_argument("--theme", default="cyberpunk", help="theme name from themes.json")
+    ap.add_argument("--theme", default="johnwick", help="theme name from themes.json")
     ap.add_argument("--profile", type=pathlib.Path, default=HERE / "profile.json", help="profile.json")
     ap.add_argument("--city", default="rotate",
                     choices=["classic", "metropolis", "reactor", "circuit", "terrain", "rally", "cycle", "rotate"],
