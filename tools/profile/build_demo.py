@@ -35,7 +35,8 @@ def page(themes, prof, articles):
         return f'<img data-slice="{slice_path}" src="profile/{first}/{slice_path}" loading="lazy" alt="">'
 
     rows = [img("header.svg"), img("projects.svg")]
-    rows.append('<div class="grid2">' + "".join(f'<div>{img(f"card-{s}.svg")}</div>' for s in slugs) + "</div>")
+    for i in range(0, len(slugs), 2):                          # project cards two per row
+        rows.append('<div class="grid2">' + "".join(f'<div>{img(f"card-{s}.svg")}</div>' for s in slugs[i:i + 2]) + "</div>")
     rows.append(img("contribution-city.svg"))                  # animated cycle
     rows.append(img("stats.svg"))
     if nposts:
