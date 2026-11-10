@@ -1,15 +1,15 @@
 {
-  "updated": "2026-11-08",
+  "updated": "2026-11-10",
   "year": 2026,
   "created_at": "2016-08-02T11:05:11Z",
-  "stars": 43,
+  "stars": 44,
   "forks": 1,
   "followers": 15,
-  "commits_year": 1415,
-  "commits_all": 1590,
-  "prs": 155,
-  "prs_merged": 129,
-  "streak_current": 0,
+  "commits_year": 1419,
+  "commits_all": 1594,
+  "prs": 156,
+  "prs_merged": 130,
+  "streak_current": 1,
   "streak_longest": 25,
   "hackathon_wins": 0,
   "languages": {
@@ -31,7 +31,7 @@
     "Batchfile": 374
   },
   "repo_stars": {
-    "my_network_scanner": 11,
+    "my_network_scanner": 12,
     "examiner": 2,
     "pironman_grafana_dashboard": 10,
     "ensight_airflow_egitim": 2,
@@ -60,6 +60,6 @@
     "views": 107013,
     "followers": 13270
   },
-  "contributions_year": 1601,
-  "contributions_all": 1818
+  "contributions_year": 1605,
+  "contributions_all": 1822
 }
